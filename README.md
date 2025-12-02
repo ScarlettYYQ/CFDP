@@ -38,4 +38,4 @@ Due to licensing, datasets are not included.
 We provide toy samples under data/ for quick functional testing.
 
 ## 🚀 run Demo
-python run.sh
+bash run.sh
