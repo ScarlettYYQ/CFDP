@@ -35,7 +35,7 @@ BBQ (Parrish et al., 2022)
 StereoSet (Nadeem et al., 2021)
 
 Due to licensing, datasets are not included.
-We provide toy samples under cfdp/data/ for quick functional testing.
+We provide toy samples under data/ for quick functional testing.
 
 ## 🚀 run Demo
-python run.sh
+bash run.sh
