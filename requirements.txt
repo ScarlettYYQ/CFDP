@@ -1,0 +1,4 @@
+transformers>=4.45.0
+k-means-constrained
+backoff
+openai>=1.40.0
