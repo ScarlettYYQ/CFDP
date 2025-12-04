@@ -5,6 +5,7 @@ import openai
 from openai import OpenAI
 import argparse
 import os
+from tqdm import tqdm
 
 
 def making_prompt(context, question, ans):
@@ -92,8 +93,8 @@ def train(args):
 
 
     data = []
-    for i in range(5):
-        print(i)
+    for i in tqdm(range(len(train_df))):
+        # print(i)
         unknown_label = train_df["unknown_label"].iloc[i]
         context = train_df["context"].iloc[i]
         question = train_df["question"].iloc[i]
@@ -126,7 +127,6 @@ if __name__ == "__main__":
     parser.add_argument("--base_url", type=str, default="")
     parser.add_argument("--type", type=str, default="")
     parser.add_argument("--data_name", type=str, default="")
-    # parser.add_argument("--client_name", type=str, default="cere")
     parser.add_argument("--temperature", type=float, default=0.7)
     args = parser.parse_args()
     client = OpenAI(

@@ -10,6 +10,7 @@ import numpy as np
 import torch
 import argparse
 import json
+from tqdm import tqdm
 
 def making_prompt(context, question, ans):
     return f"{context} The question is: {question}, Please select the correct answer from ans0: {ans[0]}, ans1 : {ans[1]} ans2: {ans[2]}."
@@ -49,7 +50,7 @@ def train(args):
     test_q, test_gold,test_bias,test_anti_bias,unknown_label=[],[],[],[],[]
     records = []
     top = args.demonstration_num
-    for i in range(len(test_df)):
+    for i in tqdm(range(len(test_df))):
         context = test_df["context"].iloc[i]
         question = test_df["question"].iloc[i]
         ans = test_df[["ans0", "ans1", "ans2"]].iloc[i].tolist()
@@ -87,11 +88,8 @@ def train(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--start_case", type=int, default=0)  # restart from this case
-    parser.add_argument("--run_case", type=int, default=200)  # demo = 2, otherwise 100
     parser.add_argument("--demonstration_num", type=int, default=4)
     parser.add_argument("--type", type=str, default="")
-
     parser.add_argument("--data_name", type=str, default="")
     args = parser.parse_args()
     train(args)

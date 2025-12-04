@@ -2,15 +2,11 @@ import argparse
 import numpy as np
 from function import *
 from openai import OpenAI
-# import boto3
 import os
 from collections import Counter
-# from sklearn.cluster import KMeans
 from k_means_constrained import KMeansConstrained as KMeans
 from transformers import BertTokenizer, BertModel
-import datetime
-from openai import AzureOpenAI
-from cerebras.cloud.sdk import Cerebras
+from tqdm import tqdm
 
 
 def build_train(train_data):
@@ -84,7 +80,7 @@ def intervention_results(t_q, wrong_q, wrong_wcot, wrong_a, wrong_g, train_wrong
                                             rep[2])
         final_result = LLM(client, wrong_messages, model, args.temperature2, t)
         weighted_list = [extract_last_yes_or_no(res) for res in final_result]
-        print("intervention:", weighted_list)
+        # print("intervention:", weighted_list)
         for i in ["ans0", "ans1", "ans2"]:
             vote_score_dict[i].append(weighted_list.count(i) / t)
             case_file.write(
@@ -99,7 +95,7 @@ def train(args, client, km, train_q, train_a, train_g, train_labels, wrong_q, wr
     cot_sc_list = []
     llm_output = []
     bias_num, anti_bias_num, unknown_num = 0, 0, 0
-    for qst in range(len(train_q)-8):
+    for qst in tqdm(range(len(train_q))):
         print(qst, "————————————————————————————————————————————————————————————————————————————")
         case_file.write('\n')
         case_file.write(str(qst))
@@ -113,7 +109,7 @@ def train(args, client, km, train_q, train_a, train_g, train_labels, wrong_q, wr
         bias_label, anti_bias_label, unknown_label = train_labels[qst][-3], train_labels[qst][-2], train_labels[qst][-1]
         LLM_result = generate_cot(train_q[qst], train_a[qst], train_g[qst], client, args.demonstration_num, args.cot_m,
                                   args.model, args.temperature1)
-        print("first round:", LLM_result[-1])
+        # print("first round:", LLM_result[-1])
         cot_sc, cot_res_list = cot_voting(LLM_result[-1], args.min_ratio)
         cot_sc_list.append(cot_sc)
         vectors = bert_encode(LLM_result[-2], bert_tok, bert, device)
@@ -143,12 +139,12 @@ def train(args, client, km, train_q, train_a, train_g, train_labels, wrong_q, wr
         case_file.write(
             f"Finally, we chose the answer with the largest weight as the final answer. Therefore, the final answer obtained according to the Causal Prompting method is {final_result}.\n")
 
-        print(f"bias_label: {bias_label}, anti_bias_label: {anti_bias_label}, unknown_label: {unknown_label}\n")
+        # print(f"bias_label: {bias_label}, anti_bias_label: {anti_bias_label}, unknown_label: {unknown_label}\n")
         bias_num += 1 if final_result == bias_label else 0
         anti_bias_num += 1 if final_result == anti_bias_label else 0
         unknown_num += 1 if final_result != unknown_label else 0
         acc = accuracy(llm_output, true_gold)
-        print("CFDP accuracy =", acc)
+        # print("CFDP accuracy =", acc)
         case_file.write("\nllm_output =" + str(llm_output) + "\n")
         case_file.write("\ntrue_gold =" + str(true_gold) + "\n")
 
